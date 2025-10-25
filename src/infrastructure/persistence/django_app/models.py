@@ -2,6 +2,7 @@
 Django models - Adaptadores de persistencia para la arquitectura hexagonal.
 Estos modelos NO son las entidades del dominio, son adaptadores de infraestructura.
 """
+
 import uuid
 from django.db import models
 
@@ -15,36 +16,42 @@ class UserModel(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = 'users'
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
-        ordering = ['-created_at']
+        db_table = "users"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.name} ({self.email})"
 
 
 class SourceModel(models.Model):
+    class SourceTypeChoices(models.IntegerChoices):
+        CLARIN = 1, "Clarín"
+        LA_NACION = 2, "La Nación"
+        PAGINA12 = 3, "Página 12"
+        INFOBAE = 4, "Infobae"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=255)
-    dominio = models.CharField(max_length=255, unique=True)
-    pais = models.CharField(max_length=100)
+    source_type = models.IntegerField(
+        choices=SourceTypeChoices.choices, unique=True, db_index=True
+    )
     activo = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = 'sources'
-        verbose_name = 'Source'
-        verbose_name_plural = 'Sources'
-        ordering = ['-created_at']
+        db_table = "sources"
+        verbose_name = "Source"
+        verbose_name_plural = "Sources"
+        ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=['dominio']),
-            models.Index(fields=['activo']),
+            models.Index(fields=["source_type"]),
+            models.Index(fields=["activo"]),
         ]
 
     def __str__(self):
-        return f"{self.nombre} ({self.dominio})"
+        return self.get_source_type_display()
 
 
 class NewsArticleModel(models.Model):
@@ -60,14 +67,14 @@ class NewsArticleModel(models.Model):
     updated_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = 'news_articles'
-        verbose_name = 'News Article'
-        verbose_name_plural = 'News Articles'
-        ordering = ['-fecha_publicacion']
+        db_table = "news_articles"
+        verbose_name = "News Article"
+        verbose_name_plural = "News Articles"
+        ordering = ["-fecha_publicacion"]
         indexes = [
-            models.Index(fields=['fuente', 'fecha_publicacion']),
-            models.Index(fields=['categoria']),
-            models.Index(fields=['procesado']),
+            models.Index(fields=["fuente", "fecha_publicacion"]),
+            models.Index(fields=["categoria"]),
+            models.Index(fields=["procesado"]),
         ]
 
     def __str__(self):
@@ -76,29 +83,31 @@ class NewsArticleModel(models.Model):
 
 class ScrapingJobModel(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('running', 'Running'),
-        ('completed', 'Completed'),
-        ('failed', 'Failed'),
+        ("pending", "Pending"),
+        ("running", "Running"),
+        ("completed", "Completed"),
+        ("failed", "Failed"),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     fuente = models.CharField(max_length=255, db_index=True)
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default="pending", db_index=True
+    )
     total_articulos = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = 'scraping_jobs'
-        verbose_name = 'Scraping Job'
-        verbose_name_plural = 'Scraping Jobs'
-        ordering = ['-fecha_inicio']
+        db_table = "scraping_jobs"
+        verbose_name = "Scraping Job"
+        verbose_name_plural = "Scraping Jobs"
+        ordering = ["-fecha_inicio"]
         indexes = [
-            models.Index(fields=['fuente', 'status']),
-            models.Index(fields=['status', 'fecha_inicio']),
+            models.Index(fields=["fuente", "status"]),
+            models.Index(fields=["status", "fecha_inicio"]),
         ]
 
     def __str__(self):

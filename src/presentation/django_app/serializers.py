@@ -2,6 +2,7 @@
 Django REST Framework Serializers.
 Capa de presentación - validan y serializan datos de entrada/salida.
 """
+
 from rest_framework import serializers
 
 
@@ -24,22 +25,21 @@ class UserSerializer(serializers.Serializer):
 
 
 class SourceCreateSerializer(serializers.Serializer):
-    nombre = serializers.CharField(max_length=255)
-    dominio = serializers.CharField(max_length=255)
-    pais = serializers.CharField(max_length=100)
+    source_type = serializers.ChoiceField(
+        choices=["CLARIN", "LA_NACION", "PAGINA12", "INFOBAE"]
+    )
 
 
 class SourceUpdateSerializer(serializers.Serializer):
-    nombre = serializers.CharField(max_length=255, required=False)
-    dominio = serializers.CharField(max_length=255, required=False)
-    pais = serializers.CharField(max_length=100, required=False)
+    activo = serializers.BooleanField(required=False)
 
 
 class SourceSerializer(serializers.Serializer):
     id = serializers.UUIDField(read_only=True)
-    nombre = serializers.CharField()
-    dominio = serializers.CharField()
-    pais = serializers.CharField()
+    source_type = serializers.CharField(read_only=True)
+    nombre = serializers.CharField(read_only=True)
+    dominio = serializers.CharField(read_only=True)
+    pais = serializers.CharField(read_only=True)
     activo = serializers.BooleanField()
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True, allow_null=True)

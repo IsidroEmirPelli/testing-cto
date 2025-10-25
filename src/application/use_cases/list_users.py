@@ -6,7 +6,7 @@ from src.domain.repositories.user_repository import UserRepository
 
 
 class ListUsersUseCase:
-    
+
     def __init__(self, user_repository: UserRepository):
         self._user_repository = user_repository
 
@@ -22,5 +22,5 @@ class ListUsersUseCase:
             name=user.name,
             created_at=user.created_at,
             updated_at=user.updated_at,
-            is_active=user.is_active
+            is_active=user.is_active,
         )

@@ -28,9 +28,7 @@ class SourceRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_active_sources(
-        self, skip: int = 0, limit: int = 100
-    ) -> List[Source]:
+    async def get_active_sources(self, skip: int = 0, limit: int = 100) -> List[Source]:
         pass
 
     @abstractmethod

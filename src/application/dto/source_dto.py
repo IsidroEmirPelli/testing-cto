@@ -3,24 +3,23 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
+from src.domain.enums import NewsSource
+
 
 @dataclass
 class CreateSourceDTO:
-    nombre: str
-    dominio: str
-    pais: str
+    source_type: NewsSource
 
 
 @dataclass
 class UpdateSourceDTO:
-    nombre: Optional[str] = None
-    dominio: Optional[str] = None
-    pais: Optional[str] = None
+    activo: Optional[bool] = None
 
 
 @dataclass
 class SourceDTO:
     id: UUID
+    source_type: NewsSource
     nombre: str
     dominio: str
     pais: str

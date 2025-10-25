@@ -2,11 +2,13 @@
 Implementaciones Django de los repositorios.
 Adaptadores que conectan las entidades del dominio con Django ORM.
 """
+
 from typing import List, Optional
 from uuid import UUID
 from datetime import datetime
 
 from src.domain.entities import NewsArticle, Source, ScrapingJob, User
+from src.domain.enums import NewsSource
 from src.domain.repositories import (
     NewsArticleRepository,
     SourceRepository,
@@ -66,10 +68,7 @@ class DjangoUserRepository(UserRepository):
             return None
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[User]:
-        models = [
-            model
-            async for model in UserModel.objects.all()[skip : skip + limit]
-        ]
+        models = [model async for model in UserModel.objects.all()[skip : skip + limit]]
         return [self._to_entity(model) for model in models]
 
     async def update(self, user: User) -> User:
@@ -95,11 +94,10 @@ class DjangoSourceRepository(SourceRepository):
 
     @staticmethod
     def _to_entity(model: SourceModel) -> Source:
+        source_type = NewsSource(model.source_type)
         return Source(
             id=model.id,
-            nombre=model.nombre,
-            dominio=model.dominio,
-            pais=model.pais,
+            source_type=source_type,
             activo=model.activo,
             created_at=model.created_at,
             updated_at=model.updated_at,
@@ -109,9 +107,7 @@ class DjangoSourceRepository(SourceRepository):
     def _to_model(entity: Source) -> SourceModel:
         return SourceModel(
             id=entity.id,
-            nombre=entity.nombre,
-            dominio=entity.dominio,
-            pais=entity.pais,
+            source_type=entity.source_type.value,
             activo=entity.activo,
             created_at=entity.created_at,
             updated_at=entity.updated_at,
@@ -131,28 +127,27 @@ class DjangoSourceRepository(SourceRepository):
 
     async def get_by_nombre(self, nombre: str) -> Optional[Source]:
         try:
-            model = await SourceModel.objects.aget(nombre=nombre)
+            source_type = NewsSource.from_nombre(nombre)
+            model = await SourceModel.objects.aget(source_type=source_type.value)
             return self._to_entity(model)
-        except SourceModel.DoesNotExist:
+        except (SourceModel.DoesNotExist, ValueError):
             return None
 
     async def get_by_dominio(self, dominio: str) -> Optional[Source]:
         try:
-            model = await SourceModel.objects.aget(dominio=dominio)
+            source_type = NewsSource.from_dominio(dominio)
+            model = await SourceModel.objects.aget(source_type=source_type.value)
             return self._to_entity(model)
-        except SourceModel.DoesNotExist:
+        except (SourceModel.DoesNotExist, ValueError):
             return None
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[Source]:
         models = [
-            model
-            async for model in SourceModel.objects.all()[skip : skip + limit]
+            model async for model in SourceModel.objects.all()[skip : skip + limit]
         ]
         return [self._to_entity(model) for model in models]
 
-    async def get_active_sources(
-        self, skip: int = 0, limit: int = 100
-    ) -> List[Source]:
+    async def get_active_sources(self, skip: int = 0, limit: int = 100) -> List[Source]:
         models = [
             model
             async for model in SourceModel.objects.filter(activo=True)[
@@ -163,9 +158,7 @@ class DjangoSourceRepository(SourceRepository):
 
     async def update(self, source: Source) -> Source:
         model = await SourceModel.objects.aget(id=source.id)
-        model.nombre = source.nombre
-        model.dominio = source.dominio
-        model.pais = source.pais
+        model.source_type = source.source_type.value
         model.activo = source.activo
         model.updated_at = source.updated_at
         await model.asave()
@@ -232,12 +225,9 @@ class DjangoNewsArticleRepository(NewsArticleRepository):
         except NewsArticleModel.DoesNotExist:
             return None
 
-    async def get_all(
-        self, skip: int = 0, limit: int = 100
-    ) -> List[NewsArticle]:
+    async def get_all(self, skip: int = 0, limit: int = 100) -> List[NewsArticle]:
         models = [
-            model
-            async for model in NewsArticleModel.objects.all()[skip : skip + limit]
+            model async for model in NewsArticleModel.objects.all()[skip : skip + limit]
         ]
         return [self._to_entity(model) for model in models]
 
@@ -328,8 +318,7 @@ class DjangoScrapingJobRepository(ScrapingJobRepository):
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[ScrapingJob]:
         models = [
-            model
-            async for model in ScrapingJobModel.objects.all()[skip : skip + limit]
+            model async for model in ScrapingJobModel.objects.all()[skip : skip + limit]
         ]
         return [self._to_entity(model) for model in models]
 

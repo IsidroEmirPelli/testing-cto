@@ -8,86 +8,158 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='UserModel',
+            name="UserModel",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('email', models.EmailField(max_length=255, unique=True)),
-                ('name', models.CharField(max_length=255)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("email", models.EmailField(max_length=255, unique=True)),
+                ("name", models.CharField(max_length=255)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'verbose_name': 'User',
-                'verbose_name_plural': 'Users',
-                'db_table': 'users',
-                'ordering': ['-created_at'],
+                "verbose_name": "User",
+                "verbose_name_plural": "Users",
+                "db_table": "users",
+                "ordering": ["-created_at"],
             },
         ),
         migrations.CreateModel(
-            name='SourceModel',
+            name="SourceModel",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('nombre', models.CharField(max_length=255)),
-                ('dominio', models.CharField(max_length=255, unique=True)),
-                ('pais', models.CharField(max_length=100)),
-                ('activo', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=255)),
+                ("dominio", models.CharField(max_length=255, unique=True)),
+                ("pais", models.CharField(max_length=100)),
+                ("activo", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'verbose_name': 'Source',
-                'verbose_name_plural': 'Sources',
-                'db_table': 'sources',
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['dominio'], name='sources_dominio_065a06_idx'), models.Index(fields=['activo'], name='sources_activo_7d90cb_idx')],
+                "verbose_name": "Source",
+                "verbose_name_plural": "Sources",
+                "db_table": "sources",
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(fields=["dominio"], name="sources_dominio_065a06_idx"),
+                    models.Index(fields=["activo"], name="sources_activo_7d90cb_idx"),
+                ],
             },
         ),
         migrations.CreateModel(
-            name='ScrapingJobModel',
+            name="ScrapingJobModel",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('fuente', models.CharField(db_index=True, max_length=255)),
-                ('fecha_inicio', models.DateTimeField()),
-                ('fecha_fin', models.DateTimeField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('running', 'Running'), ('completed', 'Completed'), ('failed', 'Failed')], db_index=True, default='pending', max_length=20)),
-                ('total_articulos', models.IntegerField(default=0)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("fuente", models.CharField(db_index=True, max_length=255)),
+                ("fecha_inicio", models.DateTimeField()),
+                ("fecha_fin", models.DateTimeField(blank=True, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("running", "Running"),
+                            ("completed", "Completed"),
+                            ("failed", "Failed"),
+                        ],
+                        db_index=True,
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                ("total_articulos", models.IntegerField(default=0)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'verbose_name': 'Scraping Job',
-                'verbose_name_plural': 'Scraping Jobs',
-                'db_table': 'scraping_jobs',
-                'ordering': ['-fecha_inicio'],
-                'indexes': [models.Index(fields=['fuente', 'status'], name='scraping_jo_fuente_00207c_idx'), models.Index(fields=['status', 'fecha_inicio'], name='scraping_jo_status_846205_idx')],
+                "verbose_name": "Scraping Job",
+                "verbose_name_plural": "Scraping Jobs",
+                "db_table": "scraping_jobs",
+                "ordering": ["-fecha_inicio"],
+                "indexes": [
+                    models.Index(
+                        fields=["fuente", "status"],
+                        name="scraping_jo_fuente_00207c_idx",
+                    ),
+                    models.Index(
+                        fields=["status", "fecha_inicio"],
+                        name="scraping_jo_status_846205_idx",
+                    ),
+                ],
             },
         ),
         migrations.CreateModel(
-            name='NewsArticleModel',
+            name="NewsArticleModel",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('titulo', models.CharField(max_length=500)),
-                ('contenido', models.TextField()),
-                ('fuente', models.CharField(db_index=True, max_length=255)),
-                ('fecha_publicacion', models.DateTimeField()),
-                ('url', models.URLField(max_length=1000, unique=True)),
-                ('categoria', models.CharField(blank=True, db_index=True, max_length=255, null=True)),
-                ('procesado', models.BooleanField(db_index=True, default=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("titulo", models.CharField(max_length=500)),
+                ("contenido", models.TextField()),
+                ("fuente", models.CharField(db_index=True, max_length=255)),
+                ("fecha_publicacion", models.DateTimeField()),
+                ("url", models.URLField(max_length=1000, unique=True)),
+                (
+                    "categoria",
+                    models.CharField(
+                        blank=True, db_index=True, max_length=255, null=True
+                    ),
+                ),
+                ("procesado", models.BooleanField(db_index=True, default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'verbose_name': 'News Article',
-                'verbose_name_plural': 'News Articles',
-                'db_table': 'news_articles',
-                'ordering': ['-fecha_publicacion'],
-                'indexes': [models.Index(fields=['fuente', 'fecha_publicacion'], name='news_articl_fuente_092b20_idx'), models.Index(fields=['categoria'], name='news_articl_categor_cf10fd_idx'), models.Index(fields=['procesado'], name='news_articl_procesa_bc1798_idx')],
+                "verbose_name": "News Article",
+                "verbose_name_plural": "News Articles",
+                "db_table": "news_articles",
+                "ordering": ["-fecha_publicacion"],
+                "indexes": [
+                    models.Index(
+                        fields=["fuente", "fecha_publicacion"],
+                        name="news_articl_fuente_092b20_idx",
+                    ),
+                    models.Index(
+                        fields=["categoria"], name="news_articl_categor_cf10fd_idx"
+                    ),
+                    models.Index(
+                        fields=["procesado"], name="news_articl_procesa_bc1798_idx"
+                    ),
+                ],
             },
         ),
     ]

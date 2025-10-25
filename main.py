@@ -7,5 +7,5 @@ if __name__ == "__main__":
         "src.presentation.api.main:app",
         host=settings.host,
         port=settings.port,
-        reload=settings.debug
+        reload=settings.debug,
     )

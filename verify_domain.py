@@ -6,6 +6,7 @@ Demuestra la funcionalidad de las entidades de dominio sin dependencias externas
 
 from datetime import datetime, timezone
 from src.domain.entities import NewsArticle, Source, ScrapingJob
+from src.domain.enums import NewsSource
 
 
 def main():
@@ -40,11 +41,7 @@ def main():
 
     print("3. Creación de Source")
     print("-" * 60)
-    source = Source.create(
-        nombre="El País",
-        dominio="elpais.com",
-        pais="España",
-    )
+    source = Source.create(source_type=NewsSource.CLARIN)
     print(f"✅ Fuente creada con ID: {source.id}")
     print(f"   Nombre: {source.nombre}")
     print(f"   Dominio: {source.dominio}")
@@ -60,9 +57,15 @@ def main():
     print(f"✅ Fuente reactivada: {source.activo}")
     print()
 
-    print("5. Creación y ciclo de vida de ScrapingJob")
+    print("5. Listado de todas las fuentes disponibles")
     print("-" * 60)
-    job = ScrapingJob.create(fuente="elpais.com")
+    for news_source in NewsSource.all_sources():
+        print(f"   - {news_source.nombre}: {news_source.dominio}")
+    print()
+
+    print("6. Creación y ciclo de vida de ScrapingJob")
+    print("-" * 60)
+    job = ScrapingJob.create(fuente="Clarín")
     print(f"✅ Job creado con ID: {job.id}")
     print(f"   Status inicial: {job.status}")
     print(f"   Total artículos: {job.total_articulos}")
@@ -70,11 +73,11 @@ def main():
 
     job.start()
     print(f"✅ Job iniciado - Status: {job.status}")
-    
+
     for i in range(5):
         job.increment_articles()
     print(f"✅ Artículos procesados: {job.total_articulos}")
-    
+
     job.complete(job.total_articulos)
     print(f"✅ Job completado - Status: {job.status}")
     print(f"   Total final: {job.total_articulos}")

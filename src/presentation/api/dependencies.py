@@ -6,7 +6,9 @@ from src.application.use_cases.get_user import GetUserUseCase
 from src.application.use_cases.list_users import ListUsersUseCase
 from src.application.use_cases.update_user import UpdateUserUseCase
 from src.domain.repositories.user_repository import UserRepository
-from src.infrastructure.persistence.in_memory_user_repository import InMemoryUserRepository
+from src.infrastructure.persistence.in_memory_user_repository import (
+    InMemoryUserRepository,
+)
 
 
 @lru_cache()
