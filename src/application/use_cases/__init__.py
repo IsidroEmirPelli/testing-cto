@@ -7,6 +7,7 @@ from src.application.use_cases.list_users import ListUsersUseCase
 from src.application.use_cases.register_source import RegisterSourceUseCase
 from src.application.use_cases.scrape_news import ScrapeNewsUseCase
 from src.application.use_cases.scrape_and_persist_articles import ScrapeAndPersistArticlesUseCase
+from src.application.use_cases.scrape_all_sources import ScrapeAllSourcesUseCase
 from src.application.use_cases.update_user import UpdateUserUseCase
 
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     "RegisterSourceUseCase",
     "ScrapeNewsUseCase",
     "ScrapeAndPersistArticlesUseCase",
+    "ScrapeAllSourcesUseCase",
 ]
