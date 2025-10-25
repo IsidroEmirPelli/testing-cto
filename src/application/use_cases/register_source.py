@@ -9,15 +9,13 @@ class RegisterSourceUseCase:
         self._source_repository = source_repository
 
     async def execute(self, dto: CreateSourceDTO) -> SourceDTO:
-        existing_source = await self._source_repository.get_by_dominio(dto.dominio)
-        if existing_source:
-            raise ValueError(f"Source with domain {dto.dominio} already exists")
-
-        source = Source.create(
-            nombre=dto.nombre,
-            dominio=dto.dominio,
-            pais=dto.pais,
+        existing_source = await self._source_repository.get_by_nombre(
+            dto.source_type.nombre
         )
+        if existing_source:
+            raise ValueError(f"Source {dto.source_type.nombre} already exists")
+
+        source = Source.create(source_type=dto.source_type)
         created_source = await self._source_repository.create(source)
 
         return self._to_dto(created_source)
@@ -26,6 +24,7 @@ class RegisterSourceUseCase:
     def _to_dto(source: Source) -> SourceDTO:
         return SourceDTO(
             id=source.id,
+            source_type=source.source_type,
             nombre=source.nombre,
             dominio=source.dominio,
             pais=source.pais,

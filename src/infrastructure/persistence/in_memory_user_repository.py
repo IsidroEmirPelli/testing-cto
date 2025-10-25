@@ -6,7 +6,7 @@ from src.domain.repositories.user_repository import UserRepository
 
 
 class InMemoryUserRepository(UserRepository):
-    
+
     def __init__(self):
         self._users: Dict[UUID, User] = {}
 

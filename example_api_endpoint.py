@@ -32,14 +32,17 @@ logger = logging.getLogger(__name__)
 # ENDPOINT 1: Ejecutar Scraping (POST)
 # =============================================================================
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])  # Cambiar a AllowAny si no requiere autenticación
+
+@api_view(["POST"])
+@permission_classes(
+    [IsAuthenticated]
+)  # Cambiar a AllowAny si no requiere autenticación
 def execute_scraping(request):
     """
     Ejecuta el coordinador de scraping para todas las fuentes activas.
-    
+
     POST /api/scraping/execute/
-    
+
     Respuesta:
     {
         "success": true,
@@ -56,52 +59,57 @@ def execute_scraping(request):
     """
     try:
         logger.info(f"Iniciando scraping via API - Usuario: {request.user}")
-        
+
         # Crear repositorios
         source_repo = DjangoSourceRepository()
         job_repo = DjangoScrapingJobRepository()
         article_repo = DjangoNewsArticleRepository()
-        
+
         # Crear caso de uso
         scrape_all = ScrapeAllSourcesUseCase(
             source_repository=source_repo,
             scraping_job_repository=job_repo,
             article_repository=article_repo,
         )
-        
+
         # Ejecutar (async)
         result = asyncio.run(scrape_all.execute())
-        
-        logger.info(f"Scraping completado - Artículos: {result['total_articles_scraped']}")
-        
-        return Response({
-            'success': True,
-            'message': 'Scraping ejecutado exitosamente',
-            'data': result
-        }, status=status.HTTP_200_OK)
-        
+
+        logger.info(
+            f"Scraping completado - Artículos: {result['total_articles_scraped']}"
+        )
+
+        return Response(
+            {
+                "success": True,
+                "message": "Scraping ejecutado exitosamente",
+                "data": result,
+            },
+            status=status.HTTP_200_OK,
+        )
+
     except Exception as e:
         logger.error(f"Error ejecutando scraping via API: {e}", exc_info=True)
-        return Response({
-            'success': False,
-            'message': 'Error ejecutando scraping',
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"success": False, "message": "Error ejecutando scraping", "error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 # =============================================================================
 # ENDPOINT 2: Obtener Estado del Último Scraping (GET)
 # =============================================================================
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def get_last_scraping_status(request):
     """
     Obtiene el estado de los últimos jobs de scraping.
-    
+
     GET /api/scraping/status/
     GET /api/scraping/status/?limit=10
-    
+
     Respuesta:
     {
         "success": true,
@@ -117,68 +125,73 @@ def get_last_scraping_status(request):
     }
     """
     try:
-        limit = int(request.GET.get('limit', 10))
-        
+        limit = int(request.GET.get("limit", 10))
+
         job_repo = DjangoScrapingJobRepository()
         jobs = asyncio.run(job_repo.get_all(skip=0, limit=limit))
-        
+
         # Construir respuesta
         jobs_data = []
         total_articles = 0
         completed_count = 0
         failed_count = 0
-        
+
         for job in jobs:
-            jobs_data.append({
-                'id': str(job.id),
-                'fuente': job.fuente,
-                'status': job.status,
-                'total_articulos': job.total_articulos,
-                'fecha_inicio': job.fecha_inicio.isoformat(),
-                'fecha_fin': job.fecha_fin.isoformat() if job.fecha_fin else None,
-            })
-            
-            total_articles += job.total_articulos
-            if job.status == 'completed':
-                completed_count += 1
-            elif job.status == 'failed':
-                failed_count += 1
-        
-        return Response({
-            'success': True,
-            'data': {
-                'jobs': jobs_data,
-                'summary': {
-                    'total_jobs': len(jobs),
-                    'completed': completed_count,
-                    'failed': failed_count,
-                    'total_articles': total_articles,
+            jobs_data.append(
+                {
+                    "id": str(job.id),
+                    "fuente": job.fuente,
+                    "status": job.status,
+                    "total_articulos": job.total_articulos,
+                    "fecha_inicio": job.fecha_inicio.isoformat(),
+                    "fecha_fin": job.fecha_fin.isoformat() if job.fecha_fin else None,
                 }
-            }
-        }, status=status.HTTP_200_OK)
-        
+            )
+
+            total_articles += job.total_articulos
+            if job.status == "completed":
+                completed_count += 1
+            elif job.status == "failed":
+                failed_count += 1
+
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "jobs": jobs_data,
+                    "summary": {
+                        "total_jobs": len(jobs),
+                        "completed": completed_count,
+                        "failed": failed_count,
+                        "total_articles": total_articles,
+                    },
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
     except Exception as e:
         logger.error(f"Error obteniendo estado de scraping: {e}", exc_info=True)
-        return Response({
-            'success': False,
-            'message': 'Error obteniendo estado',
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"success": False, "message": "Error obteniendo estado", "error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 # =============================================================================
 # ENDPOINT 3: Obtener Estadísticas por Fuente (GET)
 # =============================================================================
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def get_source_statistics(request, source_name):
     """
     Obtiene estadísticas históricas de una fuente específica.
-    
+
     GET /api/scraping/statistics/Clarín/
     GET /api/scraping/statistics/Clarín/?limit=20
-    
+
     Respuesta:
     {
         "success": true,
@@ -193,66 +206,81 @@ def get_source_statistics(request, source_name):
     }
     """
     try:
-        limit = int(request.GET.get('limit', 10))
-        
+        limit = int(request.GET.get("limit", 10))
+
         job_repo = DjangoScrapingJobRepository()
         jobs = asyncio.run(job_repo.get_by_fuente(source_name, skip=0, limit=100))
-        
+
         if not jobs:
-            return Response({
-                'success': False,
-                'message': f'No se encontraron jobs para la fuente: {source_name}'
-            }, status=status.HTTP_404_NOT_FOUND)
-        
+            return Response(
+                {
+                    "success": False,
+                    "message": f"No se encontraron jobs para la fuente: {source_name}",
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         # Calcular estadísticas
         total_jobs = len(jobs)
         total_articles = sum(job.total_articulos for job in jobs)
-        completed_jobs = sum(1 for job in jobs if job.status == 'completed')
-        
+        completed_jobs = sum(1 for job in jobs if job.status == "completed")
+
         avg_articles = total_articles / total_jobs if total_jobs > 0 else 0
         success_rate = (completed_jobs / total_jobs * 100) if total_jobs > 0 else 0
-        
-        recent_jobs = [{
-            'id': str(job.id),
-            'status': job.status,
-            'total_articulos': job.total_articulos,
-            'fecha_inicio': job.fecha_inicio.isoformat(),
-            'fecha_fin': job.fecha_fin.isoformat() if job.fecha_fin else None,
-        } for job in jobs[:limit]]
-        
-        return Response({
-            'success': True,
-            'data': {
-                'source': source_name,
-                'total_jobs': total_jobs,
-                'total_articles': total_articles,
-                'avg_articles_per_job': round(avg_articles, 2),
-                'success_rate': round(success_rate, 2),
-                'recent_jobs': recent_jobs,
+
+        recent_jobs = [
+            {
+                "id": str(job.id),
+                "status": job.status,
+                "total_articulos": job.total_articulos,
+                "fecha_inicio": job.fecha_inicio.isoformat(),
+                "fecha_fin": job.fecha_fin.isoformat() if job.fecha_fin else None,
             }
-        }, status=status.HTTP_200_OK)
-        
+            for job in jobs[:limit]
+        ]
+
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "source": source_name,
+                    "total_jobs": total_jobs,
+                    "total_articles": total_articles,
+                    "avg_articles_per_job": round(avg_articles, 2),
+                    "success_rate": round(success_rate, 2),
+                    "recent_jobs": recent_jobs,
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
     except Exception as e:
-        logger.error(f"Error obteniendo estadísticas de {source_name}: {e}", exc_info=True)
-        return Response({
-            'success': False,
-            'message': 'Error obteniendo estadísticas',
-            'error': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error(
+            f"Error obteniendo estadísticas de {source_name}: {e}", exc_info=True
+        )
+        return Response(
+            {
+                "success": False,
+                "message": "Error obteniendo estadísticas",
+                "error": str(e),
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 # =============================================================================
 # ENDPOINT 4: Health Check (GET)
 # =============================================================================
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def scraping_health_check(request):
     """
     Verifica el estado del sistema de scraping.
-    
+
     GET /api/scraping/health/
-    
+
     Respuesta:
     {
         "success": true,
@@ -267,33 +295,37 @@ def scraping_health_check(request):
     try:
         source_repo = DjangoSourceRepository()
         job_repo = DjangoScrapingJobRepository()
-        
+
         # Verificar fuentes activas
         active_sources = asyncio.run(source_repo.get_active_sources())
-        
+
         # Obtener último job
         recent_jobs = asyncio.run(job_repo.get_all(skip=0, limit=1))
         last_job = recent_jobs[0] if recent_jobs else None
-        
+
         system_ready = len(active_sources) > 0
-        
-        return Response({
-            'success': True,
-            'data': {
-                'status': 'healthy' if system_ready else 'warning',
-                'active_sources': len(active_sources),
-                'last_job_time': last_job.fecha_inicio.isoformat() if last_job else None,
-                'system_ready': system_ready,
-            }
-        }, status=status.HTTP_200_OK)
-        
+
+        return Response(
+            {
+                "success": True,
+                "data": {
+                    "status": "healthy" if system_ready else "warning",
+                    "active_sources": len(active_sources),
+                    "last_job_time": (
+                        last_job.fecha_inicio.isoformat() if last_job else None
+                    ),
+                    "system_ready": system_ready,
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
     except Exception as e:
         logger.error(f"Error en health check: {e}", exc_info=True)
-        return Response({
-            'success': False,
-            'message': 'Sistema no disponible',
-            'error': str(e)
-        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response(
+            {"success": False, "message": "Sistema no disponible", "error": str(e)},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
 
 
 # =============================================================================

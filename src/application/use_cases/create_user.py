@@ -5,13 +5,13 @@ from src.domain.value_objects.email import Email
 
 
 class CreateUserUseCase:
-    
+
     def __init__(self, user_repository: UserRepository):
         self._user_repository = user_repository
 
     async def execute(self, dto: CreateUserDTO) -> UserDTO:
         email = Email(dto.email)
-        
+
         existing_user = await self._user_repository.get_by_email(str(email))
         if existing_user:
             raise ValueError(f"User with email {email} already exists")
@@ -29,5 +29,5 @@ class CreateUserUseCase:
             name=user.name,
             created_at=user.created_at,
             updated_at=user.updated_at,
-            is_active=user.is_active
+            is_active=user.is_active,
         )

@@ -20,9 +20,7 @@ class NewsArticleRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_all(
-        self, skip: int = 0, limit: int = 100
-    ) -> List[NewsArticle]:
+    async def get_all(self, skip: int = 0, limit: int = 100) -> List[NewsArticle]:
         pass
 
     @abstractmethod

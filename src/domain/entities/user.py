@@ -22,7 +22,7 @@ class User:
             name=name,
             created_at=now,
             updated_at=None,
-            is_active=True
+            is_active=True,
         )
 
     def update_name(self, name: str) -> None:

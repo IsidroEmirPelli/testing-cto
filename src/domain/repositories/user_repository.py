@@ -6,7 +6,7 @@ from src.domain.entities.user import User
 
 
 class UserRepository(ABC):
-    
+
     @abstractmethod
     async def create(self, user: User) -> User:
         pass

@@ -8,7 +8,7 @@ app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     description="FastAPI application with Hexagonal Architecture",
-    debug=settings.debug
+    debug=settings.debug,
 )
 
 app.add_middleware(
@@ -28,5 +28,5 @@ async def root():
     return {
         "message": "Welcome to FastAPI Hexagonal Architecture",
         "docs": "/docs",
-        "redoc": "/redoc"
+        "redoc": "/redoc",
     }
