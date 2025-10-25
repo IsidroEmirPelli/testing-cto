@@ -1,85 +1,33 @@
-# FastAPI Hexagonal Architecture
+# Project Documentation
 
-Una aplicación base de FastAPI siguiendo los principios de Clean Code y arquitectura hexagonal.
+All project documentation has been organized in the `docs/` directory.
 
-## 🏗️ Arquitectura
+## Documentation Index
 
-Este proyecto implementa la arquitectura hexagonal (puertos y adaptadores) con las siguientes capas:
+Please refer to the [docs](./docs/) directory for comprehensive documentation.
 
-```
-src/
-├── domain/              # Capa de dominio (núcleo de negocio)
-│   ├── entities/        # Entidades del dominio
-│   ├── value_objects/   # Objetos de valor
-│   └── repositories/    # Interfaces de repositorios (puertos)
-├── application/         # Capa de aplicación
-│   ├── use_cases/       # Casos de uso
-│   └── dto/             # Data Transfer Objects
-├── infrastructure/      # Capa de infraestructura (adaptadores)
-│   ├── persistence/     # Implementaciones de repositorios
-│   ├── external_services/ # Servicios externos
-│   └── config/          # Configuración
-└── presentation/        # Capa de presentación
-    ├── api/             # Endpoints de API
-    └── schemas/         # Schemas de Pydantic
-```
+### Main Documentation Files
 
-## 🚀 Instalación
+- **[README](./docs/README.md)** - Main project README
+- **[Architecture](./docs/ARCHITECTURE.md)** - System architecture overview
+- **[Quick Start Scraper](./docs/QUICK_START_SCRAPER.md)** - Quick start guide for the scraper
+- **[Usage](./docs/USAGE.md)** - General usage instructions
 
-1. Clona el repositorio
-2. Crea un entorno virtual:
-```bash
-python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
-```
+### API Documentation
 
-3. Instala las dependencias:
-```bash
-pip install -r requirements.txt
-```
+- **[API Examples](./docs/API_EXAMPLES.md)** - API usage examples
+- **[Scraper API Integration](./docs/SCRAPER_API_INTEGRATION.md)** - Integration guide for scraper API
+- **[Scraper Usage Examples](./docs/SCRAPER_USAGE_EXAMPLES.md)** - Practical examples for using the scraper
 
-4. Configura las variables de entorno:
-```bash
-cp .env.example .env
-# Edita .env con tus configuraciones
-```
+### Django Documentation
 
-## 🏃 Ejecución
+- **[Django README](./docs/README_DJANGO.md)** - Django-specific documentation
+- **[Django Migration Summary](./docs/DJANGO_MIGRATION_SUMMARY.md)** - Summary of Django migrations
+- **[Migration to Django](./docs/MIGRATION_TO_DJANGO.md)** - Guide for migrating to Django
 
-```bash
-python main.py
-```
+### Additional Documentation
 
-O con uvicorn directamente:
-```bash
-uvicorn src.presentation.api.main:app --reload
-```
-
-La aplicación estará disponible en: http://localhost:8000
-Documentación interactiva en: http://localhost:8000/docs
-
-## 🧪 Testing
-
-```bash
-pytest
-```
-
-Con cobertura:
-```bash
-pytest --cov=src --cov-report=html
-```
-
-## 📋 Principios de Clean Code
-
-- **Single Responsibility Principle**: Cada clase tiene una única responsabilidad
-- **Dependency Inversion**: Las capas externas dependen de las internas
-- **Separation of Concerns**: Cada capa tiene responsabilidades bien definidas
-- **Explicit is better than implicit**: Código claro y legible
-- **Names should reveal intent**: Nombres descriptivos y significativos
-
-## 🔌 Puertos y Adaptadores
-
-- **Puertos**: Interfaces definidas en la capa de dominio
-- **Adaptadores**: Implementaciones concretas en la capa de infraestructura
-
-Esta arquitectura permite cambiar fácilmente las implementaciones sin afectar el núcleo del negocio.
+- **[Scrapy Adapter](./docs/SCRAPY_ADAPTER_README.md)** - Scrapy adapter documentation
+- **[Final Summary](./docs/RESUMEN_FINAL.md)** - Final project summary
+- **[Ticket 2 Summary](./docs/TICKET-2-SUMMARY.md)** - Summary of Ticket 2 changes
+- **[Ticket 3 Summary](./docs/TICKET-3-SUMMARY.md)** - Summary of Ticket 3 changes
