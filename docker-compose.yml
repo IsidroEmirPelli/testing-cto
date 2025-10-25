@@ -1,29 +1,51 @@
 version: '3.8'
 
 services:
-  app:
+  web:
     build: .
+    container_name: news_scraping_web
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=true
-      - DATABASE_URL=postgresql://user:password@db:5432/appdb
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-dev-key-please-change-in-production
+      - DATABASE_URL=postgresql://newsuser:newspass@db:5432/newsdb
+      - ALLOWED_HOSTS=localhost,127.0.0.1,web
+      - DJANGO_SETTINGS_MODULE=src.infrastructure.config.django_settings
     volumes:
       - .:/app
+      - static_volume:/app/staticfiles
     depends_on:
-      - db
-    command: python main.py
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 --workers 4 --reload --timeout 120 src.infrastructure.config.wsgi:application"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   db:
     image: postgres:15-alpine
+    container_name: news_scraping_db
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=appdb
+      - POSTGRES_USER=newsuser
+      - POSTGRES_PASSWORD=newspass
+      - POSTGRES_DB=newsdb
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U newsuser -d newsdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
+  static_volume:
